@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
 import Searchbar from './Searchbar';
 import ImageGallery from './ImageGallery';
@@ -10,58 +10,73 @@ import './styles.css';
 const API_KEY = '39935227-75739c8736a388a48177e3f8a';
 const BASE_URL = 'https://pixabay.com/api/';
 
-const App = () => {
-  const [query, setQuery] = useState('');
-  const [images, setImages] = useState([]);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      query: '',
+      images: [],
+      page: 1,
+      isLoading: false,
+      selectedImage: null,
+    };
+  }
 
-  const handleSearchSubmit = (newQuery) => {
-    setQuery(newQuery);
-    setImages([]);
-    setPage(1);
-    fetchImages(newQuery, 1);
+  handleSearchSubmit = (newQuery) => {
+    this.setState({
+      query: newQuery,
+      images: [],
+      page: 1,
+    });
+    this.fetchImages(newQuery, 1);
   };
 
-  const fetchImages = async (query, pageNumber) => {
+  fetchImages = async (query, pageNumber) => {
     try {
-      setIsLoading(true);
+      this.setState({ isLoading: true });
       const response = await axios.get(
         `${BASE_URL}?key=${API_KEY}&q=${query}&page=${pageNumber}&image_type=photo&orientation=horizontal&per_page=12`
       );
-      setImages((prevImages) => [...prevImages, ...response.data.hits]);
+      this.setState((prevState) => ({
+        images: [...prevState.images, ...response.data.hits],
+      }));
     } catch (error) {
       console.error('Error fetching images:', error);
     } finally {
-      setIsLoading(false);
+      this.setState({ isLoading: false });
     }
   };
 
-  const loadMoreImages = () => {
+  loadMoreImages = () => {
+    const { query, page } = this.state;
     const nextPage = page + 1;
-    fetchImages(query, nextPage);
-    setPage(nextPage);
+    this.fetchImages(query, nextPage);
+    this.setState({ page: nextPage });
   };
 
-  const openModal = (image) => {
-    setSelectedImage(image);
+  openModal = (image) => {
+    this.setState({ selectedImage: image });
   };
 
-  const closeModal = () => {
-    setSelectedImage(null);
+  closeModal = () => {
+    this.setState({ selectedImage: null });
   };
 
-  return (
-    <div>
-      <Searchbar onSubmit={handleSearchSubmit} />
-      <ImageGallery images={images} onImageClick={openModal} />
-      {isLoading && <Loader />}
-      {images.length > 0 && !isLoading && <Button onClick={loadMoreImages} isVisible={images.length >= 12} />}
-      {selectedImage && <Modal {...selectedImage} onCloseModal={closeModal} />}
-    </div>
-  );
-};
+  render() {
+    const { query, images, isLoading, selectedImage } = this.state;
+
+    return (
+      <div>
+        <Searchbar onSubmit={this.handleSearchSubmit} />
+        <ImageGallery images={images} onImageClick={this.openModal} />
+        {isLoading && <Loader />}
+        {images.length > 0 && !isLoading && <Button onClick={this.loadMoreImages} isVisible={images.length >= 12} />}
+        {selectedImage && <Modal {...selectedImage} onCloseModal={this.closeModal} />}
+      </div>
+    );
+  }
+}
 
 export default App;
+
 
