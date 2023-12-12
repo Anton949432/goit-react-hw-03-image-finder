@@ -27,7 +27,9 @@ const App = () => {
   const fetchImages = async (query, pageNumber) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${BASE_URL}?key=${API_KEY}&q=${query}&page=${pageNumber}&image_type=photo&orientation=horizontal&per_page=12`);
+      const response = await axios.get(
+        `${BASE_URL}?key=${API_KEY}&q=${query}&page=${pageNumber}&image_type=photo&orientation=horizontal&per_page=12`
+      );
       setImages((prevImages) => [...prevImages, ...response.data.hits]);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -55,7 +57,7 @@ const App = () => {
       <Searchbar onSubmit={handleSearchSubmit} />
       <ImageGallery images={images} onImageClick={openModal} />
       {isLoading && <Loader />}
-      {images.length > 0 && !isLoading && <Button onClick={loadMoreImages} />}
+      {images.length > 0 && !isLoading && <Button onClick={loadMoreImages} isVisible={images.length >= 12} />}
       {selectedImage && <Modal {...selectedImage} onCloseModal={closeModal} />}
     </div>
   );
