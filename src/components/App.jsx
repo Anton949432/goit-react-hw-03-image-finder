@@ -22,6 +22,12 @@ class App extends Component {
     };
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.page !== prevState.page || this.state.query !== prevState.query) {
+      this.fetchImages(this.state.query, this.state.page);
+    }
+  }
+
   handleSearchSubmit = (newQuery) => {
     this.setState({
       query: newQuery,

@@ -9,10 +9,10 @@ const Modal = ({ onCloseModal, largeImageURL, webformatURL }) => {
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            window.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keydown', handleKeyDown);
         };
     }, [onCloseModal]);
 
@@ -38,5 +38,6 @@ Modal.propTypes = {
 };
 
 export default Modal;
+
 
 
